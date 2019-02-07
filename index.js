@@ -16,6 +16,8 @@ const fromView = "Grid view";
 const toTable = "TEST";
 const today = moment().startOf("day");
 
+console.log("Today is", today.format("YYYY-MM-DD"), ".");
+
 function secondsSinceMidNight(datetimeOrUndefined) {
   if (datetimeOrUndefined) {
     const datetime = moment(datetimeOrUndefined);
@@ -41,16 +43,23 @@ base(fromTable).select({
     const summary = record.get("Summary");
     const filterFormula = "AND({Summary} = '" + summary + "', DATETIME_FORMAT({Work end}) = '" + workEndDate.utc().format("YYYY-MM-DDTHH:mm:ss+00:00") + "')";
 
+    console.log("Going through", summary, "...");
+
     if (endDate && endDate.isBefore(workEndDate)) {
       return;
     }
+
+    console.log("Looking for existing record...");
 
     base(toTable).select({
       filterByFormula: filterFormula
     }).eachPage(function page(existing, _) {
       if (existing.length > 0) {
+        console.log("Existing record found.");
         return;
       }
+
+      console.log("Creating new record...");
 
       base(toTable).create({
         "Summary": summary,
@@ -62,6 +71,8 @@ base(fromTable).select({
         "Group": "Recurring"
       }, function(err, record) {
         if (err) { console.error(err); return; }
+
+        console.log("New record created.");
       });
     });
   });
