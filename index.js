@@ -45,7 +45,13 @@ base(fromTable).select({
 
     console.log("Going through", summary, "...");
 
+    if (startDate && startDate.isAfter(today)) {
+      console.log("Series not started.");
+      return;
+    }
+
     if (endDate && endDate.isBefore(workEndDate)) {
+      console.log("Series ended.");
       return;
     }
 
