@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "airtable": "^0.5.8",
+    "dotenv": "^6.2.0",
+    "moment": "^2.24.0"
+  }
+}
