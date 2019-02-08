@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "airtable": "^0.5.8",
     "dotenv": "^6.2.0",
