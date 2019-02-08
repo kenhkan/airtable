@@ -1,3 +1,5 @@
+console.time("wall-time");
+
 require('dotenv').config();
 
 const Airtable = require("airtable");
@@ -89,4 +91,6 @@ base(fromTable).select({
   fetchNextPage();
 }, function done(err) {
   if (err) { console.error(err); return; }
+
+  console.timeEnd("wall-time");
 });
