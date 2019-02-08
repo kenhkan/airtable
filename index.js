@@ -31,11 +31,16 @@ function secondsSinceMidNight(datetimeOrUndefined) {
   }
 }
 
+function endOfProgram() {
+  if (itemCount === 0) {
+    console.timeEnd("wall-time");
+  }
+}
+
 base(fromTable).select({
   view: fromView
 }).eachPage(function page(records, fetchNextPage) {
   records.forEach(function(record) {
-    const itemId = itemCount++;
     const startDate = moment(record.get("Start date")).startOf("day");
     const endDate = record.get("End date") && moment(record.get("End date")).startOf("day");
     const period = record.get("Period (days)");
@@ -46,19 +51,21 @@ base(fromTable).select({
     const workEndInSeconds  = secondsSinceMidNight(record.get("Work end"));
     const workEndDate = workEndInSeconds && dueDate.clone().add(workEndInSeconds, "seconds") || dueDate;
     const summary = record.get("Summary");
-    const filterFormula = "AND({Summary} = '" + summary + "', DATETIME_FORMAT({Work end}) = '" + workEndDate.utc().format("YYYY-MM-DDTHH:mm:ss+00:00") + "')";
+    const filterFormula = "AND({Summary} = '" + summary + "', DATETIME_FORMAT({Work end}) = '" + workEndDate.clone().utc().format("YYYY-MM-DDTHH:mm:ss+00:00") + "')";
 
-    console.log(itemId, "Going through", summary, "...");
+    console.log("Looking at ", summary, "...");
 
     if (startDate && startDate.isAfter(today)) {
-      console.log(itemId, "Series not started.");
+      console.log("Series not started.");
       return;
     }
 
     if (endDate && endDate.isBefore(workEndDate)) {
-      console.log(itemId, "Series ended.");
+      console.log("Series ended.");
       return;
     }
+
+    const itemId = itemCount++;
 
     console.log(itemId, "Looking for existing record...");
 
@@ -67,6 +74,8 @@ base(fromTable).select({
     }).eachPage(function page(existing, _) {
       if (existing.length > 0) {
         console.log(itemId, "Existing record found.");
+        itemCount--;
+        endOfProgram();
         return;
       }
 
@@ -81,16 +90,23 @@ base(fromTable).select({
         "Project": record.get("Project"),
         "Group": "Recurring"
       }, function(err, record) {
-        if (err) { console.error(err); return; }
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(itemId, "New record created.");
+        }
 
-        console.log(itemId, "New record created.");
+        itemCount--;
+        endOfProgram();
       });
     });
   });
 
   fetchNextPage();
 }, function done(err) {
-  if (err) { console.error(err); return; }
+  if (err) {
+    console.error(err);
+  }
 
-  console.timeEnd("wall-time");
+  endOfProgram();
 });
