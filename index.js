@@ -3,10 +3,11 @@ console.time("wall-time");
 require('dotenv').config();
 
 const Airtable = require("airtable");
-const moment = require("moment");
+const moment = require('moment-timezone');
 const airtableApiKey = process.env.AIRTABLE_API_KEY;
 const baseName = "appPLvQUWIL4UbPGi";
 
+moment.tz.setDefault("America/New_York");
 Airtable.configure({
   endpointUrl: "https://api.airtable.com",
   apiKey: airtableApiKey
