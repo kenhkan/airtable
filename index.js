@@ -16,7 +16,7 @@ Airtable.configure({
 const base = Airtable.base(baseName);
 const fromTable = "Recurring";
 const fromView = "Grid view";
-const toTable = "TEST";
+const toTable = "Promises";
 const today = moment().startOf("day");
 
 var itemCount = 0;
