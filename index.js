@@ -16,6 +16,8 @@ const fromView = "Grid view";
 const toTable = "TEST";
 const today = moment().startOf("day");
 
+var itemCount = 0;
+
 console.log("Today is", today.format("YYYY-MM-DD"), ".");
 
 function secondsSinceMidNight(datetimeOrUndefined) {
@@ -31,6 +33,7 @@ base(fromTable).select({
   view: fromView
 }).eachPage(function page(records, fetchNextPage) {
   records.forEach(function(record) {
+    const itemId = itemCount++;
     const startDate = moment(record.get("Start date")).startOf("day");
     const endDate = record.get("End date") && moment(record.get("End date")).startOf("day");
     const period = record.get("Period (days)");
@@ -43,29 +46,29 @@ base(fromTable).select({
     const summary = record.get("Summary");
     const filterFormula = "AND({Summary} = '" + summary + "', DATETIME_FORMAT({Work end}) = '" + workEndDate.utc().format("YYYY-MM-DDTHH:mm:ss+00:00") + "')";
 
-    console.log("Going through", summary, "...");
+    console.log(itemId, "Going through", summary, "...");
 
     if (startDate && startDate.isAfter(today)) {
-      console.log("Series not started.");
+      console.log(itemId, "Series not started.");
       return;
     }
 
     if (endDate && endDate.isBefore(workEndDate)) {
-      console.log("Series ended.");
+      console.log(itemId, "Series ended.");
       return;
     }
 
-    console.log("Looking for existing record...");
+    console.log(itemId, "Looking for existing record...");
 
     base(toTable).select({
       filterByFormula: filterFormula
     }).eachPage(function page(existing, _) {
       if (existing.length > 0) {
-        console.log("Existing record found.");
+        console.log(itemId, "Existing record found.");
         return;
       }
 
-      console.log("Creating new record...");
+      console.log(itemId, "Creating new record...");
 
       base(toTable).create({
         "Summary": summary,
@@ -78,7 +81,7 @@ base(fromTable).select({
       }, function(err, record) {
         if (err) { console.error(err); return; }
 
-        console.log("New record created.");
+        console.log(itemId, "New record created.");
       });
     });
   });
