@@ -89,7 +89,7 @@ base(fromTable).select({
         "Due": dueDate.format("YYYY-MM-DD"),
         "Notes": record.get("Notes"),
         "Project": record.get("Project"),
-        "Group": "Recurring"
+        "Grouping": "Recurring"
       }, function(err, record) {
         if (err) {
           console.error(err);
