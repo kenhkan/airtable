@@ -42,7 +42,7 @@ function goThroughRecord(record, periodCount) {
   const startDate = moment(record.get("Start date")).startOf("day");
   const endDate = record.get("End date") && moment(record.get("End date")).startOf("day");
   const period = record.get("Period (days)");
-  const startToTargetInDays = Math.ceil(Math.abs(startDate.diff(today, "days")) / period) * period * periodCount;
+  const startToTargetInDays = Math.ceil(Math.abs(startDate.diff(today, "days")) / period) * period + period * periodCount;
   const dueDate = startDate.clone().add(startToTargetInDays, "days");
   const workStartInSeconds = secondsSinceMidNight(record.get("Work start"));
   const workStartDate = workStartInSeconds && dueDate.clone().add(workStartInSeconds, "seconds") || null;
@@ -51,7 +51,7 @@ function goThroughRecord(record, periodCount) {
   const summary = record.get("Summary");
   const filterFormula = "AND({Summary} = '" + summary + "', DATETIME_FORMAT({Work end}) = '" + workEndDate.clone().utc().format("YYYY-MM-DDTHH:mm:ss+00:00") + "')";
 
-  console.log("Looking at ", summary, "...");
+  console.log("Looking at", summary, "with work end date of", workEndDate.format("YYYY-MM-DDTHH:mm:ss+00:00"));
 
   if (startDate && startDate.isAfter(today)) {
     console.log("Series not started.");
@@ -77,7 +77,7 @@ function goThroughRecord(record, periodCount) {
       return;
     }
 
-    console.log(itemId, "Creating new record with work end date of ", workEndDate);
+    console.log(itemId, "Creating new record...");
 
     base(toTable).create({
       "Summary": summary,
@@ -104,8 +104,8 @@ base(fromTable).select({
   view: fromView
 }).eachPage(function page(records, fetchNextPage) {
   records.forEach(function(record) {
+    goThroughRecord(record, 0);
     goThroughRecord(record, 1);
-    goThroughRecord(record, 2);
   });
 
   fetchNextPage();
