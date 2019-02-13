@@ -104,8 +104,10 @@ base(fromTable).select({
   view: fromView
 }).eachPage(function page(records, fetchNextPage) {
   records.forEach(function(record) {
-    goThroughRecord(record, 0);
-    goThroughRecord(record, 1);
+    // Plan eight weeks out
+    for (var i = 0, l = 8; i < l; i++) {
+      goThroughRecord(record, i);
+    }
   });
 
   fetchNextPage();
