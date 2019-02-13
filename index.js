@@ -77,7 +77,7 @@ function goThroughRecord(record, periodCount) {
       return;
     }
 
-    console.log(itemId, "Creating new record...");
+    console.log(itemId, "Creating new record with work end date of ", workEndDate);
 
     base(toTable).create({
       "Summary": summary,
